@@ -1,27 +1,24 @@
-apiVersion: argoproj.io/v1alpha1
-kind: Rollout
+apiVersion: v1
+kind: Service
 metadata:
-  name: backend-rollout
+  name: backend-active
   namespace: production
 spec:
-  replicas: 3
-  strategy:
-    blueGreen:
-      activeService: backend-active
-      previewService: backend-preview
-      autoPromotionEnabled: true
   selector:
-    matchLabels:
-      app: backend
-  template:
-    metadata:
-      labels:
-        app: backend
-    spec:
-      imagePullSecrets:
-        - name: ecr-secret
-      containers:
-        - name: backend
-          image: 829730167765.dkr.ecr.ap-northeast-1.amazonaws.com/backend:latest
-          ports:
-            - containerPort: 3000
+    app: backend
+  ports:
+    - port: 3000
+      targetPort: 3000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-preview
+  namespace: production
+spec:
+  selector:
+    app: backend
+  ports:
+    - port: 3000
+      targetPort: 3000
+
