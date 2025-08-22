@@ -22,6 +22,6 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: <AWS_ACCOUNT_ID>.dkr.ecr.<REGION>.amazonaws.com/frontend:latest
+          image: eshu786/frontend:latest
           ports:
             - containerPort: 80
