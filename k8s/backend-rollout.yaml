@@ -1,0 +1,27 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: backend-rollout
+  namespace: production
+spec:
+  replicas: 3
+  strategy:
+    canary:
+      steps:
+        - setWeight: 30
+        - pause: {duration: 3m}
+        - setWeight: 60
+        - pause: {duration: 3m}
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+        - name: backend
+          image: <AWS_ACCOUNT_ID>.dkr.ecr.<REGION>.amazonaws.com/backend:latest
+          ports:
+            - containerPort: 3000
