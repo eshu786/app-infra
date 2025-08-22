@@ -6,12 +6,10 @@ metadata:
 spec:
   replicas: 3
   strategy:
-    canary:
-      steps:
-        - setWeight: 30
-        - pause: {duration: 3m}
-        - setWeight: 60
-        - pause: {duration: 3m}
+    blueGreen:
+      activeService: backend-active
+      previewService: backend-preview
+      autoPromotionEnabled: true
   selector:
     matchLabels:
       app: backend
@@ -20,6 +18,8 @@ spec:
       labels:
         app: backend
     spec:
+      imagePullSecrets:
+        - name: ecr-secret
       containers:
         - name: backend
           image: 829730167765.dkr.ecr.ap-northeast-1.amazonaws.com/backend:latest
