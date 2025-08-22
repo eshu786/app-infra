@@ -1,42 +1,28 @@
-version: '3.8'
+version: '3.9'
 
 services:
   mysql:
-    image: mysql:8
+    image: mysql:8.0
     container_name: mysql
-    restart: always
-    environment:
-      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}       # from .env
-      MYSQL_DATABASE: ${DB_NAME}               # from .env
-      MYSQL_USER: ${DB_USER}                   # optional, can be added if needed
-      MYSQL_PASSWORD: ${DB_PASSWORD}
+    env_file:
+      - .env
     volumes:
       - mysql-data:/var/lib/mysql
-      - ./mysql-init:/docker-entrypoint-initdb.d
+      - ./k8s/mysql-init/init.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
       - "3306:3306"
 
   backend:
-    build: ./api
-    container_name: backend-api
-    environment:
-      DB_HOST: mysql
-      DB_USER: ${DB_USER}
-      DB_PASSWORD: ${DB_PASSWORD}
-      DB_NAME: ${DB_NAME}
-      JWT_SECRET: ${JWT_SECRET}
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    container_name: backend
+    env_file:
+      - .env
     depends_on:
       - mysql
     ports:
-      - "5000:5000"
-
-  frontend:
-    build: ./client
-    container_name: frontend-react
-    ports:
-      - "3000:80"
-    depends_on:
-      - backend
+      - "3000:3000"
 
 volumes:
   mysql-data:
