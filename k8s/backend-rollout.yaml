@@ -6,7 +6,10 @@ metadata:
 spec:
   replicas: 3
   strategy:
-    blueGreen: {}
+    blueGreen:
+      activeService: backend-active
+      previewService: backend-preview
+      autoPromotionEnabled: true
   selector:
     matchLabels:
       app: backend
@@ -16,40 +19,50 @@ spec:
         app: backend
     spec:
       initContainers:
-      - name: wait-for-mysql
-        image: busybox:1.36
-        command:
-        - sh
-        - -c
-        - |
-          echo "Waiting for MySQL..."
-          until nc -z $MYSQL_HOST $MYSQL_PORT; do
-            echo "Waiting for MySQL..."
-            sleep 5
-          done
+        - name: wait-for-mysql
+          image: busybox:1.36
+          command:
+            - sh
+            - -c
+            - |
+              echo "Waiting for MySQL..."
+              until nc -z $MYSQL_HOST $MYSQL_PORT; do
+                echo "Waiting for MySQL..."
+                sleep 5
+              done
+          env:
+            - name: MYSQL_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret
+                  key: MYSQL_HOST
+            - name: MYSQL_PORT
+              value: "3306"
       containers:
-      - name: backend
-        image: 829730167765.dkr.ecr.ap-northeast-1.amazonaws.com/backend:latest
-        ports:
-        - containerPort: 3000
-        env:
-        - name: MYSQL_USER
-          valueFrom:
-            secretKeyRef:
-              name: mysql-secret
-              key: MYSQL_USER
-        - name: MYSQL_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: mysql-secret
-              key: MYSQL_PASSWORD
-        - name: MYSQL_DATABASE
-          valueFrom:
-            secretKeyRef:
-              name: mysql-secret
-              key: MYSQL_DATABASE
-        - name: MYSQL_HOST
-          value: mysql
-        - name: MYSQL_PORT
-          value: "3306"
-
+        - name: backend
+          image: 829730167765.dkr.ecr.ap-northeast-1.amazonaws.com/backend:latest
+          ports:
+            - containerPort: 3000
+          env:
+            - name: MYSQL_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret
+                  key: MYSQL_HOST
+            - name: MYSQL_PORT
+              value: "3306"
+            - name: MYSQL_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret
+                  key: MYSQL_DATABASE
+            - name: MYSQL_USER
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret
+                  key: MYSQL_USER
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret
+                  key: MYSQL_PASSWORD
