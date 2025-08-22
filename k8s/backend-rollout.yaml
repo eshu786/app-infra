@@ -22,6 +22,6 @@ spec:
     spec:
       containers:
         - name: backend
-          image: eshu786/backend
+          image: 829730167765.dkr.ecr.ap-northeast-1.amazonaws.com/backend:latest
           ports:
             - containerPort: 3000
