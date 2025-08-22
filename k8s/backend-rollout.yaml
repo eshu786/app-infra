@@ -22,6 +22,6 @@ spec:
     spec:
       containers:
         - name: backend
-          image: eshu786/backend:latest
+          image: eshu786/backend
           ports:
             - containerPort: 3000
