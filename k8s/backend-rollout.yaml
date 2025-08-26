@@ -33,7 +33,7 @@ spec:
               echo "✅ MySQL is up and running!"
           env:
             - name: MYSQL_HOST
-              value: mysql                      # Use the service name directly
+              value: mysql
             - name: MYSQL_USER
               valueFrom:
                 secretKeyRef:
@@ -69,5 +69,19 @@ spec:
                 secretKeyRef:
                   name: mysql-secret
                   key: MYSQL_PASSWORD
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            failureThreshold: 5
       imagePullSecrets:
         - name: ecr-secret
