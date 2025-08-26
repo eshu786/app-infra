@@ -1,29 +1,29 @@
 initContainers:
-- name: wait-for-mysql
-  image: mysql:8.0
-  command:
-    - sh
-    - -c
-    - |
-      echo "⏳ Waiting for MySQL to accept connections..."
-      until mysqladmin ping -h"$MYSQL_HOST" -u"$MYSQL_USER" -p"$MYSQL_PASSWORD" --silent; do
-        echo "⏳ MySQL is not ready yet, retrying..."
-        sleep 5
-      done
-      echo "✅ MySQL is ready to accept connections!"
-  env:
-    - name: MYSQL_HOST
-      valueFrom:
-        secretKeyRef:
-          name: mysql-secret
-          key: MYSQL_HOST
-    - name: MYSQL_USER
-      valueFrom:
-        secretKeyRef:
-          name: mysql-secret
-          key: MYSQL_USER
-    - name: MYSQL_PASSWORD
-      valueFrom:
-        secretKeyRef:
-          name: mysql-secret
-          key: MYSQL_PASSWORD
+  - name: wait-for-mysql
+    image: mysql:8.0
+    command:
+      - sh
+      - -c
+      - |
+        echo "⏳ Waiting for MySQL to be available..."
+        until mysqladmin ping -h $MYSQL_HOST -u$MYSQL_USER -p$MYSQL_PASSWORD --silent; do
+          echo "❌ MySQL not ready yet..."
+          sleep 5
+        done
+        echo "✅ MySQL is up and running!"
+    env:
+      - name: MYSQL_HOST
+        valueFrom:
+          secretKeyRef:
+            name: mysql-secret
+            key: MYSQL_HOST
+      - name: MYSQL_USER
+        valueFrom:
+          secretKeyRef:
+            name: mysql-secret
+            key: MYSQL_USER
+      - name: MYSQL_PASSWORD
+        valueFrom:
+          secretKeyRef:
+            name: mysql-secret
+            key: MYSQL_PASSWORD
