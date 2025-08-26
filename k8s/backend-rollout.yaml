@@ -5,12 +5,12 @@ initContainers:
     - sh
     - -c
     - |
-      echo "⏳ Waiting for MySQL table 'users'..."
-      until mysql -h $MYSQL_HOST -u $MYSQL_USER -p$MYSQL_PASSWORD -D $MYSQL_DATABASE -e "SELECT 1 FROM users LIMIT 1"; do
-        echo "⏳ Retrying MySQL connection..."
+      echo "⏳ Waiting for MySQL to accept connections..."
+      until mysqladmin ping -h"$MYSQL_HOST" -u"$MYSQL_USER" -p"$MYSQL_PASSWORD" --silent; do
+        echo "⏳ MySQL is not ready yet, retrying..."
         sleep 5
       done
-      echo "✅ MySQL 'users' table is available!"
+      echo "✅ MySQL is ready to accept connections!"
   env:
     - name: MYSQL_HOST
       valueFrom:
@@ -27,8 +27,3 @@ initContainers:
         secretKeyRef:
           name: mysql-secret
           key: MYSQL_PASSWORD
-    - name: MYSQL_DATABASE
-      valueFrom:
-        secretKeyRef:
-          name: mysql-secret
-          key: MYSQL_DATABASE
