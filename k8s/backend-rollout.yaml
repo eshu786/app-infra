@@ -1,15 +1,16 @@
 initContainers:
 - name: wait-for-mysql
-  image: busybox:1.36
+  image: mysql:8.0
   command:
     - sh
     - -c
     - |
-      echo "Waiting for MySQL table 'users'..."
+      echo "⏳ Waiting for MySQL table 'users'..."
       until mysql -h $MYSQL_HOST -u $MYSQL_USER -p$MYSQL_PASSWORD -D $MYSQL_DATABASE -e "SELECT 1 FROM users LIMIT 1"; do
-        echo "Waiting for MySQL table 'users'..."
+        echo "⏳ Retrying MySQL connection..."
         sleep 5
       done
+      echo "✅ MySQL 'users' table is available!"
   env:
     - name: MYSQL_HOST
       valueFrom:
