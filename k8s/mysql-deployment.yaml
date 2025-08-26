@@ -10,6 +10,22 @@ stringData:
   MYSQL_USER: appuser
   MYSQL_PASSWORD: apppassword
 ---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mysql-init-script
+  namespace: production
+data:
+  init.sql: |
+    CREATE DATABASE IF NOT EXISTS mydb;
+    USE mydb;
+    CREATE TABLE IF NOT EXISTS users (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      username VARCHAR(255) NOT NULL,
+      password VARCHAR(255) NOT NULL,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -51,6 +67,13 @@ spec:
                 secretKeyRef:
                   name: mysql-secret
                   key: MYSQL_PASSWORD
+          volumeMounts:
+            - name: init-script
+              mountPath: /docker-entrypoint-initdb.d
+      volumes:
+        - name: init-script
+          configMap:
+            name: mysql-init-script
 ---
 apiVersion: v1
 kind: Service
