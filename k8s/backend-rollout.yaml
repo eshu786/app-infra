@@ -33,10 +33,7 @@ spec:
               echo "✅ MySQL is up and running!"
           env:
             - name: MYSQL_HOST
-              valueFrom:
-                secretKeyRef:
-                  name: mysql-secret
-                  key: MYSQL_HOST
+              value: mysql                      # Use the service name directly
             - name: MYSQL_USER
               valueFrom:
                 secretKeyRef:
